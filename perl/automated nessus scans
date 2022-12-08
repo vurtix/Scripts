@@ -1,0 +1,88 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use LWP::UserAgent;
+use HTTP::Request::Common;
+use Getopt::Long;
+
+# Set up the Nessus URL and login credentials
+my $url = "https://nessus.example.com/login";
+my $username = "nessus_user";
+my $password = "nessus_password";
+
+# Create a new user agent and log in to Nessus
+my $ua = LWP::UserAgent->new;
+my $response = $ua->request(POST $url, [
+    login => $username,
+    password => $password
+]);
+
+# Check for a successful login
+if ($response->is_success) {
+    print "Successfully logged in to Nessus.\n";
+}
+else {
+    print "Error logging in to Nessus: " . $response->status_line . "\n";
+    exit;
+}
+
+# Parse the command-line options
+my @targets;
+my @policies;
+my %options;
+
+GetOptions("target=s" => \@targets,
+           "policy=s" => \@policies,
+           "option=s" => \%options);
+
+# Validate the options
+if (scalar(@targets) == 0) {
+    print "Error: No target specified.\n";
+    exit;
+}
+
+if (scalar(@policies) == 0) {
+    print "Error: No policy specified.\n";
+    exit;
+}
+
+# Start the scan for each target/policy combination
+foreach my $target (@targets) {
+    foreach my $policy (@policies) {
+        # Set the parameters for the scan
+        my %scan_options = %options;
+        $scan_options{"target"} = $target;
+        $scan_options{"policy"} = $policy;
+
+        # Start the scan
+        $response = $ua->request(POST $url, \%scan_options);
+
+        # Check for a successful scan start
+        if ($response->is_success) {
+            print "Scan successfully started for target '$target' using policy '$policy'.\n";
+        }
+        else {
+            print "Error starting scan for target '$target' using policy '$policy': " . $response->status_line . "\n";
+            exit;
+        }
+    }
+}
+
+# Wait for all scans to complete
+sleep(60);
+
+# Retrieve the scan results
+$response = $ua->request(GET $url);
+
+# Check for a successful result retrieval
+if ($response->is_success) {
+    print "Scan results successfully retrieved.\n";
+}
+else {
+    print "Error retrieving scan results: " . $response->status_line . "\n";
+    exit;
+}
+
+# Process the results as needed
