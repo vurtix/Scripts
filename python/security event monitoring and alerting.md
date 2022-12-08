@@ -185,7 +185,7 @@ search_queries = [
             "field": "user_
 
 ```
-This demonstrates how you can add support for the Splunk HTTP Event Collector (HEC) API, and modify the script to use it. This would allow you to use the script to monitor and analyze security events from Elasticsearch, and to send the results to Splunk for indexing and analysis. This would enable you to use the full power of the Splunk platform to search, analyze, and visualize the security events, and to integrate the data and alerts with other security tools and systems. For example, you could use Splunk to create dashboards, alerts, reports, and analytics, and to integrate the data and alerts with other security tools and systems, such as Crowdstrike, Zscaler, or ServiceNow.
+This demonstrates how you can add support for the Splunk HTTP Event Collector (HEC) API, and modify the script to use it. This would allow you to use the script to monitor and analyze security events from Elasticsearch, and to send the results to Splunk for indexing and analysis. This would enable you to use the full power of the Splunk platform to search, analyze, and visualize the security events, and to integrate the data and alerts with other security tools and systems. For example, you could use Splunk to create dashboards, alerts, reports, and analytics, and to integrate the data and alerts with Crowdstrike, Zscaler, or ServiceNow.
 
 Here's a few more examples of how you could enhance the script to fit your specific needs and requirements.
 
