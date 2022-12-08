@@ -1,0 +1,48 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+# Set the target IP range
+my $iprange = "192.168.1.0/24";
+
+# Set the ports to scan
+my $ports = "1-65535";
+
+# Set the scan type
+my $scan_type = "SYN";
+
+# Set the maximum number of concurrent hosts to scan
+my $max_hosts = 10;
+
+# Set the maximum number of ports per host to scan
+my $max_ports = 100;
+
+# Set the maximum number of seconds to spend scanning each port
+my $port_scan_time = 5;
+
+# Set the maximum number of seconds to spend scanning each host
+my $host_scan_time = 600;
+
+# Set the number of seconds to wait between probes
+my $scan_delay = 0;
+
+# Set the interface to use for scanning
+my $interface = "eth0";
+
+# Set the path to save the scan results
+my $output_path = "/path/to/output/directory";
+
+# Set the filename for the scan results
+my $output_file = "nmap-scan-results.txt";
+
+# Set the number of seconds to wait between scans
+my $interval = 3600;
+
+while (1) {
+  # Run the scan
+  system("nmap -iL $iprange -p $ports -sT $scan_type --max-hostgroup $max_hosts --max-ports $max_ports --port-timeout $port_scan_time --host-timeout $host_scan_time --scan-delay $scan_delay -e $interface -oN $output_path/$output_file");
+
+  # Wait for the specified interval
+  sleep($interval);
+}
