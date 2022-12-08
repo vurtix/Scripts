@@ -1,0 +1,47 @@
+#!/usr/bin/python
+
+import os
+import sys
+
+from scapy.all import *
+
+# Set the target IP address
+target_ip = "192.168.1.1"
+
+# Set the target port
+target_port = 80
+
+# Set the number of packets to send
+num_packets = 10
+
+# Set the timeout for the packets
+timeout = 2
+
+# Set the payload for the packets
+payload = "GET / HTTP/1.1\r\nHost: example.com\r\n\r\n"
+
+# Set the packet sniffer callback function
+def packet_sniffer(packet):
+    # Check if the packet is a TCP packet
+    if packet.haslayer(TCP):
+        # Print the source and destination IP and port
+        print("Source: " + packet[IP].src)
+        print("Destination: " + packet[IP].dst)
+        print("Source port: " + str(packet[TCP].sport))
+        print("Destination port: " + str(packet[TCP].dport))
+
+        # Check if the packet is from the target
+        if (packet[IP].src == target_ip) and (packet[TCP].sport == target_port):
+            # Print the payload
+            print("Payload:")
+            print(packet[TCP].payload)
+
+# Set the packet filter
+packet_filter = "tcp and host " + target_ip
+
+# Start the packet sniffer
+sniff(filter=packet_filter, prn=packet_sniffer, timeout=timeout)
+
+# Send the packets
+for i in range(num_packets):
+    send(IP(dst=target_ip)/TCP(dport=target_port)/payload)
