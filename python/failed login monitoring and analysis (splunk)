@@ -1,0 +1,83 @@
+#!/usr/bin/python
+
+import os
+import sys
+import json
+import requests
+
+# Set the Splunk URL
+splunk_url = "https://splunk.example.com"
+
+# Set the Splunk username and password
+username = "splunk_user"
+password = "splunk_password"
+
+# Set the search query
+search_query = 'search event_id=4625 | stats count by user_name, source_ip | sort -count | head 10'
+
+# Set the authentication credentials
+auth = (username, password)
+
+# Set the URL for the search
+search_url = splunk_url + "/services/search/jobs"
+
+# Set the search parameters
+search_params = {
+  "search": search_query,
+  "output_mode": "json"
+}
+
+# Submit the search
+response = requests.post(search_url, params=search_params, auth=auth)
+
+# Check for a successful search submission
+if response.status_code != 200:
+    print("Error submitting search: " + response.text)
+    exit
+
+# Parse the search results
+results = json.loads(response.text)
+
+# Get the search job ID
+job_id = results["sid"]
+
+# Set the URL for the search job
+job_url = splunk_url + "/services/search/jobs/" + job_id
+
+# Set the search job parameters
+job_params = {
+  "output_mode": "json"
+}
+
+# Wait for the search job to finish
+status = "running"
+while status == "running":
+    response = requests.get(job_url, params=job_params, auth=auth)
+    job_results = json.loads(response.text)
+    status = job_results["entry"][0]["content"]["dispatchState"]
+
+# Print the results
+print("Results:")
+for result in job_results["results"]:
+    print(result["count"] + " failed logins from " + result["user_name"] + " (" + result["source_ip"] + ")")
+
+# Set the URL for the saved search
+saved_search_url = splunk_url + "/servicesNS/nobody/search/saved/searches"
+
+# Set the saved search parameters
+saved_search_params = {
+  "name": "Failed Login Monitoring",
+  "search": search_query,
+  "dispatch.earliest_time": "-1h",
+  "dispatch.latest_time": "now",
+  "is_scheduled": "1",
+  "cron_schedule": "0 * * * *"
+}
+
+# Submit the saved search
+response = requests.post(saved_search_url, data=saved_search_params, auth=auth)
+
+# Check for a successful saved search submission
+if response.status_code != 200:
+    print("Error submitting saved search: " + response.text)
+    exit
