@@ -1,0 +1,74 @@
+#!/usr/bin/python
+
+import os
+import sys
+import json
+import requests
+from requests.auth import HTTPBasicAuth
+
+# Set the Splunk URL
+splunk_url = "https://splunk.example.com"
+
+# Set the Splunk username and password
+username = "splunk_user"
+password = "splunk_password"
+
+# Set the search query
+search_query = "index=main | top 10 host"
+
+# Set the time range for the search
+time_range = "last 1h"
+
+# Set the output format
+output_format = "json"
+
+# Set the authentication credentials
+auth = HTTPBasicAuth(username, password)
+
+# Set the URL for the search
+search_url = splunk_url + "/services/search/jobs"
+
+# Set the search parameters
+search_params = {
+    "search": search_query,
+    "earliest_time": time_range,
+    "latest_time": time_range,
+    "output_mode": output_format
+}
+
+# Submit the search
+response = requests.post(search_url, params=search_params, auth=auth)
+
+# Check for a successful search submission
+if response.status_code != 200:
+    print("Error submitting search: " + response.text)
+    exit
+
+# Parse the search results
+results = json.loads(response.text)
+
+# Print the results
+print("Results:")
+for result in results["results"]:
+    print(result["host"])
+
+# Set the URL for the saved search
+saved_search_url = splunk_url + "/servicesNS/admin/search/saved/searches"
+
+# Set the saved search parameters
+saved_search_params = {
+    "name": "Top 10 Hosts",
+    "search": search_query,
+    "earliest_time": time_range,
+    "latest_time": time_range,
+    "is_scheduled": "1",
+    "cron_schedule": "0 0 * * *"
+}
+
+# Create the saved search
+response = requests.post(saved_search_url, data=saved_search_params, auth=auth)
+
+# Check for a successful saved search creation
+if response.status_code != 200:
+    print("Error creating saved search: " + response.text)
+    exit
