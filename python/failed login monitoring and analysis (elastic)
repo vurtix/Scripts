@@ -1,0 +1,77 @@
+#!/usr/bin/python
+
+import os
+import sys
+import json
+import requests
+
+# Set the Elasticsearch URL
+elasticsearch_url = "https://elasticsearch.example.com"
+
+# Set the Elasticsearch username and password
+username = "elastic_user"
+password = "elastic_password"
+
+# Set the search query
+search_query = {
+  "query": {
+    "match": {
+      "event_id": "4625"
+    }
+  },
+  "aggs": {
+    "failed_logins_by_user": {
+      "terms": {
+        "field": "user_name.keyword",
+        "size": 10
+      }
+    },
+    "failed_logins_by_source_ip": {
+      "terms": {
+        "field": "source_ip.keyword",
+        "size": 10
+      }
+    }
+  }
+}
+
+# Set the index
+index = "winlogbeat-*"
+
+# Set the time range for the search
+time_range = {
+  "range": {
+    "@timestamp": {
+      "gte": "now-1h"
+    }
+  }
+}
+
+# Set the search size
+size = 10000
+
+# Set the authentication credentials
+auth = (username, password)
+
+# Set the URL for the search
+search_url = elasticsearch_url + "/" + index + "/_search"
+
+# Set the search parameters
+search_params = {
+  "size": size,
+  "query": time_range,
+  "aggs": search_query["aggs"]
+}
+
+# Submit the search
+response = requests.post(search_url, json=search_params, auth=auth)
+
+# Check for a successful search submission
+if response.status_code != 200:
+    print("Error submitting search: " + response.text)
+    exit
+
+# Parse the search results
+results = json.loads(response.text)
+
+# Print the results
