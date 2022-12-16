@@ -1,7 +1,7 @@
 This is a Python script that can automate a wide range of tasks and processes for a SOC analyst. It uses Elasticsearch to perform multiple searches for different types of security events and retrieve the results, with advanced features such as a time range, search size, aggregation, and alerting.
 
 The script is designed to be flexible and customizable, allowing you to specify the search queries, indices, time ranges, sizes, and alert conditions for each search. This allows you to monitor and analyze a wide range of network security events, quickly and easily identify potential threats and anomalies, and automate the process of alerting and notification.
-```
+```python
 
 #!/usr/bin/python
 
