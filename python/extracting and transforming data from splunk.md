@@ -36,6 +36,7 @@ for result in results:
 with open('transformed_results.json', 'w') as f:
     json.dump(transformed_results, f)
 ```
+This script does the following:
 
 1. Imports the necessary modules: the Splunk Enterprise SDK, the json module for working with JSON data, and the time module for adding delays.
 2. Connects to Splunk using the client.connect() function from the Splunk Enterprise SDK. You will need to specify the hostname, port number, and login credentials for your Splunk instance.
