@@ -110,4 +110,4 @@ for job in jobs:
                 else:
                     print(f'Failed to apply to {title} at {company}')
 
-///
+\\\
